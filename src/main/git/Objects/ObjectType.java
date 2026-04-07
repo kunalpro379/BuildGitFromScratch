@@ -49,6 +49,50 @@ public class ObjectType<T extends GitObject> {
         }
 
     }
+    public byte[] seriallizeContent(T object)throws IOException{
+        try(
+            final var outputStream=new ByteArrayOutputStream();
+            final var dataOutputStream=new DataOutputStream(outputStream);
 
+        ){
+            serializer.serialize(object, dataOutputStream);
+            return outputStream.toByteArray();
+        }
+    }
+    public T deserialize() throws IOException{
+        return serializer.deserialize(DataInputStream);
+
+    }
+public T derserialize(byte[]bytes)throws IOException{
+    try(
+        final byteInputStream=new ByteArrayInputStream(bytes);
+        final var dataInputStreams=new DataInputStream(byteInputStream);
+    ){
+        final var obj=deserialize(dataInputStreams);
+        if(byteInputStream.read()!=-1){
+            throw new new IllegalStateStateException("buffer not fully read");
+        }
+        return obj;
+    }
+}
+public static ObjectType byName(String name){
+    for(final var type: TYPES){
+        if(type.getName().equalsIgnoreCase(name)){
+            return type;
+        }
+    }
+    throw new IllegalArgumentException(
+        "unknown object type: " + name
+    );
+}
+public static ObjectType byClass(Class<? extends GitObject>){
+    for (final var type : TYPES) {
+        if (type.getObjectClass().equals(clazz)) {
+            return type;
+        }
+    }
+
+    throw new IllegalArgumentException("unknown object type: " + clazz);
+}
     
 }
